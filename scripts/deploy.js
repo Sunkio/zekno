@@ -9,13 +9,13 @@ const main = async () => {
 		[400, 300, 150],                    // HP values
 		[1000, 500, 250],       // Stare Down values
 		[100, 450, 725],   // PowerPunch values
-		[50, 1000, 625],     // KarateChop values  
+		//[50, 1000, 625],     // KarateChop values  
 		"Evilene", // Boss name
 		"https://i.imgur.com/0Lb8zLo.jpeg", // Boss image
 		10000, // Boss hp
 		1000, // Boss Stare Down    
 		350, // Boss PowerPunch
-		500
+		//500
 		 // Boss KarateChop
 	  );
   

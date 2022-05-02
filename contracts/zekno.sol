@@ -9,8 +9,11 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "hardhat/console.sol";
+import "./revealProof.sol";
+import "./partialRevealProof.sol";
+import "./mintProof.sol";
 
-contract MyEpicGame is ERC721 {
+contract Zekno is ERC721 {
   struct CharacterAttributes {
     uint256 characterIndex;
     string name;
@@ -18,7 +21,7 @@ contract MyEpicGame is ERC721 {
     uint256 hp;
 	uint256 stareDown;
 	uint256 powerPunch;
-	uint256 karateChop;
+	//uint256 karateChop;
   }
 
 
@@ -41,7 +44,7 @@ contract MyEpicGame is ERC721 {
 		uint hp;
 		uint256 stareDown;
 		uint256 powerPunch;
-		uint256 karateChop;
+		//uint256 karateChop;
 	}
 
 	BigBoss public bigBoss;
@@ -51,7 +54,7 @@ contract MyEpicGame is ERC721 {
   mapping(address => uint256) public nftHolders;
 
 	event CharacterNFTMinted(address sender, uint256 tokenId, uint256 characterIndex);
-	event AttackComplete(uint newBossHp, uint newPlayerHp, uint newBossStareDown, uint newBossPowerPunch, uint newBossKarateChop, uint newPlayerStareDown, uint newPlayerPowerPunch, uint newPlayerKarateChop);
+	event AttackComplete(uint newBossHp, uint newPlayerHp, uint newBossStareDown, uint newBossPowerPunch, uint newPlayerStareDown, uint newPlayerPowerPunch); // /*uint newBossKarateChop,*/  // , uint newPlayerKarateChop
 
   // Data passed in to the contract when it's first created initializing the characters.
   // We're going to actually pass these values in from run.js.
@@ -61,13 +64,13 @@ contract MyEpicGame is ERC721 {
     uint[] memory characterHp,
 	uint256[] memory stareDown,
 	uint256[] memory powerPunch,
-	uint256[] memory karateChop,
+//	uint256[] memory karateChop,
 	string memory bossName, // These new variables would be passed in via run.js or deploy.js.
 	string memory bossImageURI,
 	uint256 bossHp,
 	uint256 bossStareDown,
-	uint256 bossPowerPunch,
-	uint256 bossKarateChop
+	uint256 bossPowerPunch
+	//uint256 bossKarateChop
   )
       ERC721("Zekno", "ZEKNO")
   {
@@ -77,8 +80,8 @@ contract MyEpicGame is ERC721 {
 		imageURI: bossImageURI,
 		hp: bossHp,
 		stareDown: bossStareDown,
-		powerPunch: bossPowerPunch,
-		karateChop: bossKarateChop
+		powerPunch: bossPowerPunch
+		//karateChop: bossKarateChop
 	});
 
  	console.log("Done initializing boss %s w/ HP %s, img %s", bigBoss.name, bigBoss.hp, bigBoss.imageURI);
@@ -92,8 +95,8 @@ contract MyEpicGame is ERC721 {
         imageURI: characterImageURIs[i],
         hp: characterHp[i],
 		stareDown: stareDown[i],
-		powerPunch: powerPunch[i],
-		karateChop: karateChop[i]
+		powerPunch: powerPunch[i]
+		//karateChop: karateChop[i]
       }));
 
     	CharacterAttributes memory c = defaultCharacters[i];
@@ -112,7 +115,7 @@ contract MyEpicGame is ERC721 {
 	string memory strHp = Strings.toString(charAttributes.hp);
 	string memory strStareDown = Strings.toString(charAttributes.stareDown);
 	string memory strPowerPunch = Strings.toString(charAttributes.powerPunch);
-	string memory strKarateChop = Strings.toString(charAttributes.karateChop);
+	//string memory strKarateChop = Strings.toString(charAttributes.karateChop);
 
 	string memory json = Base64.encode(
 		abi.encodePacked(
@@ -123,9 +126,11 @@ contract MyEpicGame is ERC721 {
 		'", "description": "This is an NFT that lets people play in the game Zekno!", "image": "',
 		charAttributes.imageURI,
 		'", "attributes": [ { "trait_type": "Health Points", "value": ',strHp,' }, { "trait_type": "Stare Down", "value": ',
-		strStareDown,'}, { "trait_type": "Power Punch", "value": ',strPowerPunch,'}, { "trait_type": "Karate Chop", "value": ',strKarateChop,'} ] }'
+		strStareDown,'}, { "trait_type": "Power Punch", "value": ',strPowerPunch,'} ] }'
 		)
 	);
+
+	// , { "trait_type": "Karate Chop", "value": ',strKarateChop,'}
 
 	string memory output = string(
 		abi.encodePacked("data:application/json;base64,", json)
@@ -154,7 +159,7 @@ contract MyEpicGame is ERC721 {
 	function getBigBoss() public view returns (BigBoss memory) {
   		return bigBoss;
 	}
-
+/*
 	function vrf() public view returns (bytes32 result) {
 		uint[1] memory bn;
 		bn[0] = block.number;
@@ -166,13 +171,14 @@ contract MyEpicGame is ERC721 {
 		result := mload(memPtr)
 		}
     }
-
+*/
 	function attackBoss() public {
 		// Get the state of the player's NFT.
 		uint256 nftTokenIdOfPlayer = nftHolders[msg.sender];
 		CharacterAttributes storage player = nftHolderAttributes[nftTokenIdOfPlayer];
-		bytes32 randomNumber = vrf();
-		
+		//bytes32 randomNumber = vrf();
+		bytes32 randomNumber = '1';
+
 		console.log("\nPlayer w/ character %s about to attack. Has %s HP and %s AD", player.name, player.hp);
 		console.log("Boss %s has %s HP and %s AD", bigBoss.name, bigBoss.hp);
 
@@ -220,7 +226,7 @@ contract MyEpicGame is ERC721 {
 				//"This is a putt! Next round!";
 				attackBoss();
 			}
-		} else if (randomNumber == '3') {	
+		} /*else if (randomNumber == '3') {	
 			// Allow player to attack boss.
 			if (bigBoss.karateChop < player.karateChop) {
 				bigBoss.karateChop = bigBoss.karateChop - 10;
@@ -236,12 +242,12 @@ contract MyEpicGame is ERC721 {
 				//"This is a putt! Next round!";
 				attackBoss();
 			}
-		}
+		}*/
 
 		// Console for ease.
 		console.log("Attack complete. New boss hp: %s. New player hp: %s", bigBoss.hp, player.hp);
 
-		emit AttackComplete(bigBoss.hp, player.hp, bigBoss.stareDown, bigBoss.powerPunch, bigBoss.karateChop, player.stareDown, player.powerPunch, player.karateChop);
+		emit AttackComplete(bigBoss.hp, player.hp, bigBoss.stareDown, bigBoss.powerPunch, /*bigBoss.karateChop,*/ player.stareDown, player.powerPunch); //, /*player.karateChop*/
 	}	
 
   // Users would be able to hit this function and get their NFT based on the
@@ -260,8 +266,8 @@ contract MyEpicGame is ERC721 {
       imageURI: defaultCharacters[_characterIndex].imageURI,
       hp: defaultCharacters[_characterIndex].hp,
       stareDown: defaultCharacters[_characterIndex].stareDown,
-	  powerPunch: defaultCharacters[_characterIndex].powerPunch,
-	  karateChop: defaultCharacters[_characterIndex].karateChop
+	  powerPunch: defaultCharacters[_characterIndex].powerPunch
+	//  karateChop: defaultCharacters[_characterIndex].karateChop
 	});
 
 	// Increment the tokenId.
